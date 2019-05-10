@@ -35,7 +35,8 @@ class GameFieldView: UIView {
             for j in 0..<dimention {
                 let cellView = UIView()
                 cellView.backgroundColor = .cellBackground
-                cellView.layer.cornerRadius = 6
+                cellView.layer.cornerRadius = 12
+                cellView.clipsToBounds = true
                 cells[IndexPath(row: j, section: i)] = cellView
                 addSubview(cellView)
             }
@@ -54,5 +55,4 @@ class GameFieldView: UIView {
             curPoint.x = cellSpacing
         }
     }
-    
 }
