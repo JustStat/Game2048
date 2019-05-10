@@ -8,7 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		141C451F22841AD500627B9B /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141C451E22841AD500627B9B /* Colors.swift */; };
-		141C452322841FBC00627B9B /* GameFieldVIew.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141C452222841FBC00627B9B /* GameFieldVIew.swift */; };
+		141C452322841FBC00627B9B /* GameFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141C452222841FBC00627B9B /* GameFieldView.swift */; };
+		141C452522854C2C00627B9B /* GameFieldConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 141C452422854C2C00627B9B /* GameFieldConfiguration.swift */; };
 		14FDBCAB2283F30400CAF12F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FDBCAA2283F30400CAF12F /* AppDelegate.swift */; };
 		14FDBCAD2283F30400CAF12F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14FDBCAC2283F30400CAF12F /* ViewController.swift */; };
 		14FDBCB02283F30400CAF12F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 14FDBCAE2283F30400CAF12F /* Main.storyboard */; };
@@ -18,7 +19,8 @@
 
 /* Begin PBXFileReference section */
 		141C451E22841AD500627B9B /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
-		141C452222841FBC00627B9B /* GameFieldVIew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFieldVIew.swift; sourceTree = "<group>"; };
+		141C452222841FBC00627B9B /* GameFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFieldView.swift; sourceTree = "<group>"; };
+		141C452422854C2C00627B9B /* GameFieldConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameFieldConfiguration.swift; sourceTree = "<group>"; };
 		14FDBCA72283F30400CAF12F /* Game2048.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Game2048.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14FDBCAA2283F30400CAF12F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		14FDBCAC2283F30400CAF12F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -73,7 +75,8 @@
 				14FDBCB12283F30500CAF12F /* Assets.xcassets */,
 				14FDBCB32283F30500CAF12F /* LaunchScreen.storyboard */,
 				14FDBCB62283F30500CAF12F /* Info.plist */,
-				141C452222841FBC00627B9B /* GameFieldVIew.swift */,
+				141C452222841FBC00627B9B /* GameFieldView.swift */,
+				141C452422854C2C00627B9B /* GameFieldConfiguration.swift */,
 			);
 			path = Game2048;
 			sourceTree = "<group>";
@@ -150,9 +153,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				14FDBCAD2283F30400CAF12F /* ViewController.swift in Sources */,
+				141C452522854C2C00627B9B /* GameFieldConfiguration.swift in Sources */,
 				141C451F22841AD500627B9B /* Colors.swift in Sources */,
 				14FDBCAB2283F30400CAF12F /* AppDelegate.swift in Sources */,
-				141C452322841FBC00627B9B /* GameFieldVIew.swift in Sources */,
+				141C452322841FBC00627B9B /* GameFieldView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
