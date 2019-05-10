@@ -18,19 +18,24 @@ class GameFieldView: UIView {
     init(frame: CGRect, configuration: GameFieldConfiguration) {
         self.dimention = configuration.dimention
         self.cellSpacing = configuration.cellSpacing
-        self.cellSize = (frame.width - (CGFloat(dimention + 1) * cellSpacing)) / CGFloat(dimention)
+        self.cellSize = abs((frame.width - (CGFloat(dimention + 1) * cellSpacing)) / CGFloat(dimention))
         self.cells = Dictionary()
         super.init(frame: frame)
-        addCells()
-        setNeedsLayout()
-        
+        addBackgroundCells()
+        layoutIfNeeded()
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func addCells() {
+    override var frame: CGRect {
+        didSet {
+            self.cellSize = abs((frame.width - (CGFloat(dimention + 1) * cellSpacing)) / CGFloat(dimention))
+        }
+    }
+    
+    private func addBackgroundCells() {
         for i in 0..<dimention {
             for j in 0..<dimention {
                 let cellView = UIView()

@@ -8,6 +8,8 @@
 
 import UIKit
 
+let fontScaleFactor = UIScreen.main.nativeBounds.width / 640 //Берется ширина самого маленького экрана
+
 class GameCell: UIView {
     var numberLabel: UILabel
     var number: Int
@@ -30,8 +32,7 @@ class GameCell: UIView {
     func configureView() {
         backgroundColor = UIColor.value(forKey: "color\(number)") as? UIColor
         numberLabel.textColor = number > 32 ? .white : .black
-        let fontSize: CGFloat = UIScreen.main.bounds.size.width > 320 ? 40 : 20
-        numberLabel.font = UIFont.systemFont(ofSize: fontSize, weight: .heavy)
+        numberLabel.font = UIFont.systemFont(ofSize: 30*fontScaleFactor, weight: .heavy)
         numberLabel.baselineAdjustment = .alignCenters
         numberLabel.adjustsFontSizeToFitWidth = true
         numberLabel.textAlignment = .center
