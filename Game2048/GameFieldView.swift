@@ -22,6 +22,7 @@ class GameFieldView: UIView {
         self.cells = Dictionary()
         super.init(frame: frame)
         addBackgroundCells()
+        addGestures()
         layoutIfNeeded()
     }
     
@@ -59,5 +60,55 @@ class GameFieldView: UIView {
             curPoint.y += cellSpacing + cellSize
             curPoint.x = cellSpacing
         }
+    }
+    
+    private func addGestures() {
+        let upSwipe = UISwipeGestureRecognizer(target: self, action: #selector(GameFieldView.upCommand(_:)))
+        upSwipe.numberOfTouchesRequired = 1
+        upSwipe.direction = .up
+        addGestureRecognizer(upSwipe)
+        
+        let downSwipe = UISwipeGestureRecognizer(target: self, action: #selector(GameFieldView.downCommand(_:)))
+        downSwipe.numberOfTouchesRequired = 1
+        downSwipe.direction = .down
+        addGestureRecognizer(downSwipe)
+        
+        let leftSwipe = UISwipeGestureRecognizer(target: self, action: #selector(GameFieldView.leftCommand(_:)))
+        leftSwipe.numberOfTouchesRequired = 1
+        leftSwipe.direction = .left
+        addGestureRecognizer(leftSwipe)
+        
+        let rightSwipe = UISwipeGestureRecognizer(target: self, action: #selector(GameFieldView.rightCommand(_:)))
+        rightSwipe.numberOfTouchesRequired = 1
+        rightSwipe.direction = .right
+        addGestureRecognizer(rightSwipe)
+    }
+    
+    @objc(up:)
+    func upCommand(_ r: UIGestureRecognizer!) {
+        addRandomCell()
+    }
+    
+    @objc(down:)
+    func downCommand(_ r: UIGestureRecognizer!) {
+        addRandomCell()
+    }
+    
+    @objc(left:)
+    func leftCommand(_ r: UIGestureRecognizer!) {
+        addRandomCell()
+    }
+    
+    @objc(right:)
+    func rightCommand(_ r: UIGestureRecognizer!) {
+        addRandomCell()
+    }
+    
+    private func addRandomCell() {
+        let bc = cells[IndexPath(row: Int.random(in: 0...3), section: Int.random(in: 0...3))]!
+        var stage = Int.random(in: 1...11)
+        stage = Int(truncating: NSDecimalNumber(decimal: pow(2, stage)))
+        let cell = GameCell(frame: CGRect(origin: .zero, size: bc.frame.size), number:stage)
+        bc.addSubview(cell)
     }
 }
