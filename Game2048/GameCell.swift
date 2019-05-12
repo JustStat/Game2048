@@ -30,6 +30,8 @@ class GameCell: UIView {
     }
     
     func configureView() {
+        layer.cornerRadius = 12
+        clipsToBounds = true
         backgroundColor = UIColor.value(forKey: "color\(number)") as? UIColor
         numberLabel.textColor = number > 32 ? .white : .black
         numberLabel.font = UIFont.systemFont(ofSize: 30*fontScaleFactor, weight: .heavy)

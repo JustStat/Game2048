@@ -8,12 +8,18 @@
 
 import UIKit
 
+protocol GameFieldViewDelegate: class {
+    func userDidSwipe(direction: UISwipeGestureRecognizer.Direction)
+}
+
 class GameFieldView: UIView {
     
     var dimention: Int
     var cellSpacing : CGFloat
     var cellSize: CGFloat
-    var cells: Dictionary<IndexPath, UIView>
+    var cells: Dictionary<IndexPath, BackgroundCell>
+    
+    weak var delegate: GameFieldViewDelegate?
     
     init(frame: CGRect, configuration: GameFieldConfiguration) {
         self.dimention = configuration.dimention
@@ -39,7 +45,7 @@ class GameFieldView: UIView {
     private func addBackgroundCells() {
         for i in 0..<dimention {
             for j in 0..<dimention {
-                let cellView = UIView()
+                let cellView = BackgroundCell()
                 cellView.backgroundColor = .cellBackground
                 cellView.layer.cornerRadius = 12
                 cellView.clipsToBounds = true
@@ -85,30 +91,48 @@ class GameFieldView: UIView {
     }
     
     @objc(up:)
-    func upCommand(_ r: UIGestureRecognizer!) {
-        addRandomCell()
+    func upCommand(_ r: UISwipeGestureRecognizer!) {
+        delegate?.userDidSwipe(direction: r.direction)
     }
     
     @objc(down:)
-    func downCommand(_ r: UIGestureRecognizer!) {
-        addRandomCell()
+    func downCommand(_ r: UISwipeGestureRecognizer!) {
+        delegate?.userDidSwipe(direction: r.direction)
     }
     
     @objc(left:)
-    func leftCommand(_ r: UIGestureRecognizer!) {
-        addRandomCell()
+    func leftCommand(_ r: UISwipeGestureRecognizer!) {
+        delegate?.userDidSwipe(direction: r.direction)
     }
     
     @objc(right:)
-    func rightCommand(_ r: UIGestureRecognizer!) {
-        addRandomCell()
+    func rightCommand(_ r: UISwipeGestureRecognizer!) {
+        delegate?.userDidSwipe(direction: r.direction)
     }
     
-    private func addRandomCell() {
-        let bc = cells[IndexPath(row: Int.random(in: 0...3), section: Int.random(in: 0...3))]!
-        var stage = Int.random(in: 1...11)
-        stage = Int(truncating: NSDecimalNumber(decimal: pow(2, stage)))
-        let cell = GameCell(frame: CGRect(origin: .zero, size: bc.frame.size), number:stage)
-        bc.addSubview(cell)
+    func addCellToGameBoard(path: IndexPath, cell: CellModel) {
+        guard let backgroundView = cells[path] else {
+            fatalError("cell out of bounds")
+        }
+        
+        let cell = GameCell(frame: backgroundView.frame, number:cell.value)
+        backgroundView.cell = cell
+        addSubview(cell)
+    }
+    
+    func removeCell(forPath path: IndexPath) {
+        cells[path]?.cell?.removeFromSuperview()
+        cells[path]?.cell = nil
+    }
+    
+    func moveCell(cell: CellModel, from start:IndexPath, to end:IndexPath) {
+        guard let startView = cells[start], let endView = cells[end] else {
+            return
+        }
+        
+        endView.cell = startView.cell
+        UIView.animate(withDuration: 0.2) {
+            startView.cell?.frame = endView.frame
+        }
     }
 }
