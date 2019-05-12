@@ -131,7 +131,7 @@ class GameFieldView: UIView {
         }
         
         endView.cell = startView.cell
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration: 0.1) {
             startView.cell?.frame = endView.frame
         }
     }

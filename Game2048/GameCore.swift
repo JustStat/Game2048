@@ -42,8 +42,13 @@ class GameCore {
                         }
                         if index != nil && index!.section < i {
                             moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
+                            checkCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section - 1))
+                        } else {
+                            checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i - 1))
                         }
-                        checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i - 1))
+                        if index != nil {
+                            
+                        }
                         
                     }
                 }
@@ -58,8 +63,10 @@ class GameCore {
                         
                         if index != nil && index!.section > i {
                             moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
+                             checkCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section + 1))
+                        } else {
+                            checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i + 1))
                         }
-                        checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i + 1))
                         
                     }
                 }
@@ -74,8 +81,10 @@ class GameCore {
                                 
                                 if index != nil && index!.row > j {
                                     moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
+                                    checkCollision(from: index!, to: IndexPath(row: index!.row + 1, section: index!.section))
+                                } else {
+                                    checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j + 1, section: i))
                                 }
-                                checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j + 1, section: i))
                                 
                             }
                         }
@@ -90,8 +99,14 @@ class GameCore {
                     
                                         if index != nil && index!.row < j  {
                                             moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
+                                            checkCollision(from: index!, to: IndexPath(row: index!.row - 1, section: index!.section))
+                                        } else {
+                                            checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j - 1, section: i))
                                         }
-                                        checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j - 1, section: i))
+                                        
+                                        if index != nil {
+                                            
+                                        }
                                     }
                                 }
                         }
@@ -175,11 +190,7 @@ class GameCore {
     }
     
     func checkCollision(from start:IndexPath, to end:IndexPath) {
-        guard 0..<dimention ~= end.row else {
-            return
-        }
-        
-        guard 0..<dimention ~= end.section else {
+        guard 0..<dimention ~= end.row && 0..<dimention ~= end.section else {
             return
         }
         
@@ -187,6 +198,7 @@ class GameCore {
             let cell = gameField[end.row][end.section]
             removeCell(fromPath: start)
             removeCell(fromPath: end)
+            moveCell(from: start, to: end)
             addCellToGameBoard(path: end, value: cell.value*2)
         }
     }

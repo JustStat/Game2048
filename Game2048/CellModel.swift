@@ -11,6 +11,7 @@ import Foundation
 enum CellState {
     case empty
     case filled
+    case collision
 }
 
 struct CellModel {
