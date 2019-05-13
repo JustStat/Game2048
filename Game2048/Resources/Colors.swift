@@ -21,6 +21,12 @@ extension UIColor {
         }
     }
     
+    @objc class var restartButtonShadow: UIColor {
+        get {
+            return UIColor(red: 0.750, green: 0.750, blue: 0.760, alpha: 1.0)
+        }
+    }
+    
    @objc class var color2: UIColor {
         get {
             return UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)

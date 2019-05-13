@@ -118,6 +118,15 @@ class GameFieldView: UIView {
         let cell = GameCell(frame: backgroundView.frame, number:cell.value)
         backgroundView.cell = cell
         addSubview(cell)
+        UIView.animate(withDuration: 0.10, delay: 0, options: UIView.AnimationOptions(),
+                       animations: {
+                        cell.layer.setAffineTransform(CGAffineTransform(scaleX: 1.1, y: 1.1))
+        },
+                       completion: { finished in
+                        UIView.animate(withDuration: 0.05, animations: { () -> Void in
+                            cell.layer.setAffineTransform(CGAffineTransform.identity)
+                        })
+        })
     }
     
     func removeCell(forPath path: IndexPath) {
@@ -131,7 +140,7 @@ class GameFieldView: UIView {
         }
         
         endView.cell = startView.cell
-        UIView.animate(withDuration: 0.1) {
+        UIView.animate(withDuration: 0.2) {
             startView.cell?.frame = endView.frame
         }
     }

@@ -13,13 +13,15 @@ protocol GameCoreDelegate: class {
     func modelDidRemoveCell(path: IndexPath)
     func modelDidMoveCell(cell: CellModel, from start:IndexPath, to end:IndexPath)
     func modelDidFinishMove()
+    func modelGameover(userWin: Bool)
 }
 
 class GameCore {
-    var gameField: [[CellModel]]
+    private var gameField: [[CellModel]]
     var emptyCells = [IndexPath]()
-    var dimention: Int
+    private var dimention: Int
     weak var delegate: GameCoreDelegate?
+    var hasChanges = false
     
     init(dimention: Int) {
         self.dimention = dimention
@@ -31,25 +33,37 @@ class GameCore {
         }
     }
     
+    func restat() {
+        emptyCells.removeAll()
+        for i in 0..<dimention {
+            for j in 0..<dimention {
+                removeCell(fromPath: IndexPath(row: j, section: i))
+            }
+        }
+        addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+        addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+    }
+    
     func proceedMove(direction: UISwipeGestureRecognizer.Direction) {
+        hasChanges = false
         switch direction {
         case .up:
             for i in 0..<dimention {
                 for j in 0..<dimention {
                     if gameField[j][i].state != .empty {
-                        let index = findApropriateVerticlaIndexes(forIndex: IndexPath(row: j, section: i)).min { (p1, p2) -> Bool in
+                        let index = findAppropriateVerticlaIndexes(forIndex: IndexPath(row: j, section: i)).min { (p1, p2) -> Bool in
                             p1.section < p2.section
                         }
                         if index != nil && index!.section < i {
                             moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
-                            checkCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section - 1))
+                            if checkCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section - 1)) {
+                                performCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section - 1))
+                            }
                         } else {
-                            checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i - 1))
+                            if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i - 1)) {
+                                performCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i - 1))
+                            }
                         }
-                        if index != nil {
-                            
-                        }
-                        
                     }
                 }
             }
@@ -57,66 +71,72 @@ class GameCore {
             for i in (0..<dimention).reversed() {
                 for j in (0..<dimention).reversed() {
                     if gameField[j][i].state != .empty {
-                        let index = findApropriateVerticlaIndexes(forIndex: IndexPath(row: j, section: i)).max { (p1, p2) -> Bool in
+                        let index = findAppropriateVerticlaIndexes(forIndex: IndexPath(row: j, section: i)).max { (p1, p2) -> Bool in
                             p1.section < p2.section
                         }
                         
                         if index != nil && index!.section > i {
                             moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
-                             checkCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section + 1))
+                            if checkCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section + 1)) {
+                                performCollision(from: index!, to: IndexPath(row: index!.row, section: index!.section + 1))
+                            }
                         } else {
-                            checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i + 1))
+                            if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i + 1)) {
+                                performCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i + 1))
+                            }
                         }
-                        
                     }
                 }
         }
         case .right:
-                    for i in (0..<dimention).reversed() {
-                        for j in (0..<dimention).reversed() {
-                            if gameField[j][i].state != .empty {
-                                let index = findApropriateHorisontalIndexes(forIndex: IndexPath(row: j, section: i)).max { (p1, p2) -> Bool in
-                                    p1.row < p2.row
-                                }
-                                
-                                if index != nil && index!.row > j {
-                                    moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
-                                    checkCollision(from: index!, to: IndexPath(row: index!.row + 1, section: index!.section))
-                                } else {
-                                    checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j + 1, section: i))
-                                }
-                                
+            for i in (0..<dimention).reversed() {
+                for j in (0..<dimention).reversed() {
+                    if gameField[j][i].state != .empty {
+                        let index = findAppropriateHorisontalIndexes(forIndex: IndexPath(row: j, section: i)).max { (p1, p2) -> Bool in
+                            p1.row < p2.row
+                        }
+                        
+                        if index != nil && index!.row > j {
+                            moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
+                            if checkCollision(from: index!, to: IndexPath(row: index!.row + 1, section: index!.section)) {
+                                performCollision(from: index!, to: IndexPath(row: index!.row + 1, section: index!.section))
+                            }
+                        } else {
+                            if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j + 1, section: i)) {
+                                performCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j + 1, section: i))
                             }
                         }
+                    }
                 }
+            }
         case .left:
-                            for i in 0..<dimention {
-                                for j in 0..<dimention {
-                                    if gameField[j][i].state != .empty {
-                                        let index = findApropriateHorisontalIndexes(forIndex: IndexPath(row: j, section: i)).min { (p1, p2) -> Bool in
-                                            p1.row < p2.row
-                                        }
-                    
-                                        if index != nil && index!.row < j  {
-                                            moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
-                                            checkCollision(from: index!, to: IndexPath(row: index!.row - 1, section: index!.section))
-                                        } else {
-                                            checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j - 1, section: i))
-                                        }
-                                        
-                                        if index != nil {
-                                            
-                                        }
-                                    }
-                                }
+            for i in 0..<dimention {
+                for j in 0..<dimention {
+                    if gameField[j][i].state != .empty {
+                        let index = findAppropriateHorisontalIndexes(forIndex: IndexPath(row: j, section: i)).min { (p1, p2) -> Bool in
+                            p1.row < p2.row
                         }
+
+                        if index != nil && index!.row < j  {
+                            moveCell(from: IndexPath(row: j, section: i), to: IndexPath(row: index!.row, section: index!.section))
+                            if checkCollision(from: index!, to: IndexPath(row: index!.row - 1, section: index!.section)) {
+                                performCollision(from: index!, to: IndexPath(row: index!.row - 1, section: index!.section))
+                            }
+                        } else {
+                            if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j - 1, section: i)) {
+                                performCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j - 1, section: i))
+                            }
+                        }
+                    }
+                }
+        }
         default:
             return
         }
         delegate?.modelDidFinishMove()
     }
     
-    func findApropriateVerticlaIndexes(forIndex source: IndexPath) -> [IndexPath] {
+    func findAppropriateVerticlaIndexes(forIndex source: IndexPath) -> [IndexPath] {
         var indexes = [IndexPath]()
         for index in emptyCells {
             if index.row == source.row {
@@ -127,7 +147,7 @@ class GameCore {
         return indexes.sorted()
     }
     
-    func findApropriateHorisontalIndexes(forIndex source: IndexPath) -> [IndexPath] {
+    func findAppropriateHorisontalIndexes(forIndex source: IndexPath) -> [IndexPath] {
         var indexes = [IndexPath]()
         for index in emptyCells {
             if index.section == source.section {
@@ -141,15 +161,18 @@ class GameCore {
     func addCellToGameBoard(path: IndexPath, value: Int) {
         gameField[path.row][path.section].state = .filled
         gameField[path.row][path.section].value = value
-        emptyCells.remove(at: emptyCells.firstIndex(of: path)!)
+        
+        if let removePath = emptyCells.firstIndex(of: path) {
+            emptyCells.remove(at: removePath)
+        }
         
         delegate?.modelDidAddCellToGameBoard(path: path, cell: gameField[path.row][path.section])
     }
     
     func addCellToRandomPath(value: Int) {
         guard let path = emptyCells.randomElement() else {
+            delegate?.modelGameover(userWin: false)
             return
-            //TODO: endgame
         }
         print("add - \(path)")
         addCellToGameBoard(path: path, value: value)
@@ -185,21 +208,54 @@ class GameCore {
             emptyCells.remove(at: emptyCells.firstIndex(of: end)!)
             emptyCells.append(start)
             delegate?.modelDidMoveCell(cell: cell, from: start, to: end)
+            hasChanges = true
             print("move - \(start), \(end)")
         }
     }
     
-    func checkCollision(from start:IndexPath, to end:IndexPath) {
+    func performCollision(from start:IndexPath, to end:IndexPath) {
+        let cell = gameField[end.row][end.section]
+        removeCell(fromPath: start)
+        removeCell(fromPath: end)
+        addCellToGameBoard(path: end, value: cell.value * 2)
+        hasChanges = true
+        if cell.value * 2 == 2048 {
+            delegate?.modelGameover(userWin: true)
+            hasChanges = false
+        }
+    }
+    
+    func checkCollision(from start:IndexPath, to end:IndexPath) -> Bool {
         guard 0..<dimention ~= end.row && 0..<dimention ~= end.section else {
-            return
+            return false
         }
         
-        if gameField[start.row][start.section].value == gameField[end.row][end.section].value && gameField[end.row][end.section].value > 0 {
-            let cell = gameField[end.row][end.section]
-            removeCell(fromPath: start)
-            removeCell(fromPath: end)
-            moveCell(from: start, to: end)
-            addCellToGameBoard(path: end, value: cell.value*2)
+        return gameField[start.row][start.section].value == gameField[end.row][end.section].value && gameField[end.row][end.section].value > 0
+    }
+    
+    func checkGameover() -> Bool {
+        for i in 0..<dimention {
+            for j in 0..<dimention {
+                if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j - 1, section: i)) ||
+                    (j > 0 && gameField[j - 1][i].state == .empty) {
+                    return false
+                }
+    
+                if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j + 1, section: i)) ||
+                    (j < dimention - 1 && gameField[j + 1][i].state == .empty) {
+                    return false
+                }
+                if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i + 1)) ||
+                    (i < dimention - 1 && gameField[j][i + 1].state == .empty) {
+                    return false
+                }
+                if checkCollision(from: IndexPath(row: j, section: i), to: IndexPath(row: j, section: i - 1)) ||
+                    (i > 0 && gameField[j][i - 1].state == .empty) {
+                    return false
+                }
+            }
         }
+        
+        return true
     }
 }
