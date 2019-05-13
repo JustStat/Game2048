@@ -45,12 +45,20 @@ class GameCore {
     }
     
     func proceedMove(direction: UISwipeGestureRecognizer.Direction) {
+        for i in 0..<dimention {
+            for j in 0..<dimention {
+                if gameField[j][i].state == .collision {
+                   gameField[j][i].state = .filled
+                }
+            }
+        }
+        
         hasChanges = false
         switch direction {
         case .up:
             for i in 0..<dimention {
                 for j in 0..<dimention {
-                    if gameField[j][i].state != .empty {
+                    if gameField[j][i].state == .filled  {
                         let index = findAppropriateVerticlaIndexes(forIndex: IndexPath(row: j, section: i)).min { (p1, p2) -> Bool in
                             p1.section < p2.section
                         }
@@ -70,7 +78,7 @@ class GameCore {
         case .down:
             for i in (0..<dimention).reversed() {
                 for j in (0..<dimention).reversed() {
-                    if gameField[j][i].state != .empty {
+                    if gameField[j][i].state == .filled {
                         let index = findAppropriateVerticlaIndexes(forIndex: IndexPath(row: j, section: i)).max { (p1, p2) -> Bool in
                             p1.section < p2.section
                         }
@@ -91,7 +99,7 @@ class GameCore {
         case .right:
             for i in (0..<dimention).reversed() {
                 for j in (0..<dimention).reversed() {
-                    if gameField[j][i].state != .empty {
+                    if gameField[j][i].state == .filled {
                         let index = findAppropriateHorisontalIndexes(forIndex: IndexPath(row: j, section: i)).max { (p1, p2) -> Bool in
                             p1.row < p2.row
                         }
@@ -112,7 +120,7 @@ class GameCore {
         case .left:
             for i in 0..<dimention {
                 for j in 0..<dimention {
-                    if gameField[j][i].state != .empty {
+                    if gameField[j][i].state == .filled {
                         let index = findAppropriateHorisontalIndexes(forIndex: IndexPath(row: j, section: i)).min { (p1, p2) -> Bool in
                             p1.row < p2.row
                         }
@@ -218,6 +226,7 @@ class GameCore {
         removeCell(fromPath: start)
         removeCell(fromPath: end)
         addCellToGameBoard(path: end, value: cell.value * 2)
+        gameField[end.row][end.section].state = .collision
         hasChanges = true
         if cell.value * 2 == 2048 {
             delegate?.modelGameover(userWin: true)
@@ -230,7 +239,7 @@ class GameCore {
             return false
         }
         
-        return gameField[start.row][start.section].value == gameField[end.row][end.section].value && gameField[end.row][end.section].value > 0
+        return gameField[start.row][start.section].value == gameField[end.row][end.section].value && gameField[end.row][end.section].value > 0 && gameField[end.row][end.section].state != .collision
     }
     
     func checkGameover() -> Bool {

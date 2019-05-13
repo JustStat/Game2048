@@ -25,13 +25,13 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         view.layoutIfNeeded()
         gameModel.delegate = self
         gameField.delegate = self
-        gameModel.addCellToGameBoard(path: IndexPath(row: 0, section: 0), value: 2)
-        gameModel.addCellToGameBoard(path: IndexPath(row: 1, section: 0), value: 2)
+//        gameModel.addCellToGameBoard(path: IndexPath(row: 0, section: 0), value: 1024)
+//        gameModel.addCellToGameBoard(path: IndexPath(row: 1, section: 0), value: 1024)
 //        gameModel.addCellToGameBoard(path: IndexPath(row: 2, section: 0), value: )
-        gameModel.addCellToGameBoard(path: IndexPath(row: 3, section: 0), value: 4)
+//        gameModel.addCellToGameBoard(path: IndexPath(row: 3, section: 0), value: 4)
 //        gameModel.addCellToGameBoard(path: IndexPath(row: 0, section: 2), value: 4)
-//        gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
-//        gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+        gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+        gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
     }
     
     func setupView() {
@@ -105,10 +105,9 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .milliseconds(200)) {
             if self.gameModel.hasChanges {
                 self.gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
-            } else {
-                if self.gameModel.checkGameover() {
-                    self.showGameOver(userWin: false)
-                }
+            }
+            if self.gameModel.checkGameover() {
+                self.showGameOver(userWin: false)
             }
         }
     }
