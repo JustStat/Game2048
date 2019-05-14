@@ -1,5 +1,5 @@
 //
-//  GameCell.swift
+//  GameCellView.swift
 //  Game2048
 //
 //  Created by Kirill Varlamov on 10/05/2019.
@@ -10,7 +10,7 @@ import UIKit
 
 let fontScaleFactor = UIScreen.main.nativeBounds.width / 640 //Берется ширина самого маленького экрана
 
-class GameCell: UIView {
+class GameCellView: UIView {
     var numberLabel: UILabel
     var number: Int
     var labelOffset: CGFloat = 10
@@ -25,14 +25,28 @@ class GameCell: UIView {
         configureView()
     }
     
+    override func encode(with aCoder: NSCoder) {
+        aCoder.encode(number, forKey: "number")
+        aCoder.encode(frame, forKey: "frame")
+    }
+    
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        self.numberLabel = UILabel()
+        self.number = aDecoder.decodeInteger(forKey: "number")
+        super.init(frame: aDecoder.decodeCGRect(forKey: "frame"))
+        numberLabel.frame = CGRect(x: labelOffset, y: labelOffset, width: bounds.size.width - labelOffset*2, height: bounds.size.height - labelOffset*2)
+        addSubview(numberLabel)
+        configureView()
     }
     
     func configureView() {
         layer.cornerRadius = 12
         clipsToBounds = true
-        backgroundColor = UIColor.value(forKey: "color\(number)") as? UIColor
+        if let background = UIColor.value(forKey: "color\(number)") as? UIColor {
+            backgroundColor = background
+        } else {
+            backgroundColor = .color2048
+        }
         numberLabel.textColor = number > 32 ? .white : .black
         numberLabel.font = UIFont.systemFont(ofSize: 30*fontScaleFactor, weight: .heavy)
         numberLabel.baselineAdjustment = .alignCenters

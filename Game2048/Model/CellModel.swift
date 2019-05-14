@@ -8,13 +8,13 @@
 
 import Foundation
 
-enum CellState {
+enum CellState: Int, Codable {
     case empty
     case filled
     case collision
 }
 
-struct CellModel {
+struct CellModel: Codable {
     var state = CellState.empty
     var value = 0
 }

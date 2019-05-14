@@ -13,9 +13,10 @@ let dimention = 4
 class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate {
     
     var gameField: GameFieldView!
-    let gameModel = GameCore(dimention: dimention)
+    var gameModel = GameCore(dimention: dimention)
     var cooldownTimer: Timer?
     var cooldown: Bool = false
+    var wasRestored = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,13 +26,14 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         view.layoutIfNeeded()
         gameModel.delegate = self
         gameField.delegate = self
-//        gameModel.addCellToGameBoard(path: IndexPath(row: 0, section: 0), value: 1024)
-//        gameModel.addCellToGameBoard(path: IndexPath(row: 1, section: 0), value: 1024)
-//        gameModel.addCellToGameBoard(path: IndexPath(row: 2, section: 0), value: )
-//        gameModel.addCellToGameBoard(path: IndexPath(row: 3, section: 0), value: 4)
-//        gameModel.addCellToGameBoard(path: IndexPath(row: 0, section: 2), value: 4)
-        gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
-        gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if !wasRestored {
+            gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+            gameModel.addCellToRandomPath(value: arc4random_uniform(10) == 1 ? 4 : 2)
+        }
     }
     
     func setupView() {
@@ -59,7 +61,6 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         restartButton.layer.shadowColor = UIColor.restartButtonShadow.cgColor
         restartButton.layer.shadowOpacity = 1
         restartButton.layer.shadowPath = UIBezierPath(rect: CGRect(x: -1, y: -1, width: restartButton.frame.width + 2, height: restartButton.frame.height + 21)).cgPath
-//        restartButton.layer.shadowOffset = CGSize(width: 0, height: 20)
         restartButton.layer.shadowRadius = 10
         
         view.addSubview(restartButton)
@@ -134,5 +135,26 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
     func restartButtonTap(sender: UIButton) {
         gameModel.restat()
     }
+    
+    override func encodeRestorableState(with coder: NSCoder) {
+        super.encodeRestorableState(with: coder)
+        
+        coder.encode(gameModel, forKey: "gameModel")
+        coder.encode(gameField, forKey: "gameField")
+    }
+    
+    override func decodeRestorableState(with coder: NSCoder) {
+        super.decodeRestorableState(with: coder)
+        
+        guard let gameModel = coder.decodeObject(forKey: "gameModel") as? GameCore else {
+            return
+        }
+        self.gameModel = gameModel
+        self.gameModel.delegate = self
+        self.gameModel.restoreState()
+        self.wasRestored = true
+    }
 }
+
+
 

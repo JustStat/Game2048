@@ -1,5 +1,5 @@
 //
-//  BackgroundCell.swift
+//  BackgroundCellView.swift
 //  Game2048
 //
 //  Created by Kirill Varlamov on 11/05/2019.
@@ -8,7 +8,6 @@
 
 import UIKit
 
-class BackgroundCell: UIView {
-    var cell: GameCell?
-    
+class BackgroundCellView: UIView {
+    var cell: GameCellView?
 }

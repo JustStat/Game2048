@@ -17,7 +17,7 @@ class GameFieldView: UIView {
     var dimention: Int
     var cellSpacing : CGFloat
     var cellSize: CGFloat
-    var cells: Dictionary<IndexPath, BackgroundCell>
+    var cells: Dictionary<IndexPath, BackgroundCellView>
     
     weak var delegate: GameFieldViewDelegate?
     
@@ -45,7 +45,7 @@ class GameFieldView: UIView {
     private func addBackgroundCells() {
         for i in 0..<dimention {
             for j in 0..<dimention {
-                let cellView = BackgroundCell()
+                let cellView = BackgroundCellView()
                 cellView.backgroundColor = .cellBackground
                 cellView.layer.cornerRadius = 12
                 cellView.clipsToBounds = true
@@ -115,7 +115,7 @@ class GameFieldView: UIView {
             fatalError("cell out of bounds")
         }
         
-        let cell = GameCell(frame: backgroundView.frame, number:cell.value)
+        let cell = GameCellView(frame: backgroundView.frame, number:cell.value)
         backgroundView.cell = cell
         addSubview(cell)
         UIView.animate(withDuration: 0.10, delay: 0, options: UIView.AnimationOptions(),

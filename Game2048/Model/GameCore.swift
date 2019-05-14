@@ -16,8 +16,9 @@ protocol GameCoreDelegate: class {
     func modelGameover(userWin: Bool)
 }
 
-class GameCore {
-    private var gameField: [[CellModel]]
+class GameCore: NSObject, NSCoding {
+    
+    private var gameField: [[CellModel]]!
     var emptyCells = [IndexPath]()
     private var dimention: Int
     weak var delegate: GameCoreDelegate?
@@ -266,5 +267,31 @@ class GameCore {
         }
         
         return true
+    }
+    
+    func restoreState() {
+        for i in 0..<dimention {
+            for j in 0..<dimention {
+                if gameField[j][i].state == .filled || gameField[j][i].state == .collision {
+                    delegate?.modelDidAddCellToGameBoard(path: IndexPath(row: j, section: i), cell: gameField[j][i])
+                }
+            }
+        }
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        let data = try! JSONEncoder().encode(gameField)
+        aCoder.encode(data, forKey: "gameField")
+        aCoder.encode(emptyCells, forKey: "emptyCells")
+        aCoder.encode(dimention, forKey: "dimention")
+        aCoder.encode(hasChanges, forKey: "hasChanges")
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        let data = aDecoder.decodeObject(forKey: "gameField") as? Data
+        gameField = try! JSONDecoder().decode([[CellModel]].self, from: data!)
+        emptyCells = aDecoder.decodeObject(forKey: "emptyCells") as! [IndexPath]
+        dimention = aDecoder.decodeInteger(forKey: "dimention")
+        hasChanges = aDecoder.decodeBool(forKey: "hasChanges")
     }
 }
