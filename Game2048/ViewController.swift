@@ -26,6 +26,7 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         view.layoutIfNeeded()
         gameModel.delegate = self
         gameField.delegate = self
+        gameModel.restoreState()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -109,6 +110,8 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
             }
             if self.gameModel.checkGameover() {
                 self.showGameOver(userWin: false)
+            } else {
+                self.gameModel.saveState()
             }
         }
     }
@@ -126,6 +129,11 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         cooldownTimer = Timer.scheduledTimer(timeInterval: 0.22, target: self, selector: #selector(self.timerHandler(sender:)), userInfo: nil, repeats: false)
         cooldown = true
     }
+    
+    func modelDidRestoreState() {
+        wasRestored = true
+    }
+    
     @objc(timerHandler:)
     func timerHandler(sender: Timer) {
         cooldown = false
@@ -140,11 +148,14 @@ class ViewController: UIViewController, GameCoreDelegate, GameFieldViewDelegate 
         super.encodeRestorableState(with: coder)
         
         coder.encode(gameModel, forKey: "gameModel")
-        coder.encode(gameField, forKey: "gameField")
     }
     
     override func decodeRestorableState(with coder: NSCoder) {
         super.decodeRestorableState(with: coder)
+        
+        if wasRestored {
+            return
+        }
         
         guard let gameModel = coder.decodeObject(forKey: "gameModel") as? GameCore else {
             return

@@ -13,6 +13,7 @@ protocol GameCoreDelegate: class {
     func modelDidRemoveCell(path: IndexPath)
     func modelDidMoveCell(cell: CellModel, from start:IndexPath, to end:IndexPath)
     func modelDidFinishMove()
+    func modelDidRestoreState()
     func modelGameover(userWin: Bool)
 }
 
@@ -270,6 +271,40 @@ class GameCore: NSObject, NSCoding {
     }
     
     func restoreState() {
+        let decoder = JSONDecoder()
+        
+        guard let objects = UserDefaults.standard.value(forKey: "gameField") as? Data else {
+            return
+        }
+        
+        guard let decodedGameField = try? decoder.decode(Array.self, from: objects) as [[CellModel]] else {
+            return
+        }
+        
+        gameField = decodedGameField
+        
+        guard let emptyCellsData = UserDefaults.standard.value(forKey: "emptyCells") as? Data else {
+            return
+        }
+        
+        guard let decodedEmptyCells = try? decoder.decode(Array.self, from: emptyCellsData) as [IndexPath] else {
+            return
+        }
+        
+        emptyCells = decodedEmptyCells
+        
+        guard let cachedDimetion = UserDefaults.standard.value(forKey: "dimetion") as? Int else {
+            return
+        }
+        
+        dimention = cachedDimetion
+        
+        guard let cachedHasChanges = UserDefaults.standard.value(forKey: "hasChanges") as? Bool else {
+            return
+        }
+        
+        hasChanges = cachedHasChanges
+        
         for i in 0..<dimention {
             for j in 0..<dimention {
                 if gameField[j][i].state == .filled || gameField[j][i].state == .collision {
@@ -277,19 +312,46 @@ class GameCore: NSObject, NSCoding {
                 }
             }
         }
+        delegate?.modelDidRestoreState()
+    }
+    
+    func saveState() {
+        let encoder = JSONEncoder()
+        guard let gameFieldData = try? encoder.encode(gameField) else {
+            return
+        }
+        UserDefaults.standard.set(gameFieldData, forKey: "gameField")
+        
+        guard let emptyCellsData = try? encoder.encode(emptyCells) else {
+            return
+        }
+        UserDefaults.standard.set(emptyCellsData, forKey: "emptyCells")
+        
+        UserDefaults.standard.set(dimention, forKey: "dimetion")
+        UserDefaults.standard.set(hasChanges, forKey: "hasChanges")
     }
     
     func encode(with aCoder: NSCoder) {
-        let data = try! JSONEncoder().encode(gameField)
-        aCoder.encode(data, forKey: "gameField")
+        do {
+            let data = try JSONEncoder().encode(gameField)
+            aCoder.encode(data, forKey: "gameField")
+        } catch {
+            return
+        }
+        
         aCoder.encode(emptyCells, forKey: "emptyCells")
         aCoder.encode(dimention, forKey: "dimention")
         aCoder.encode(hasChanges, forKey: "hasChanges")
     }
     
     required init?(coder aDecoder: NSCoder) {
-        let data = aDecoder.decodeObject(forKey: "gameField") as? Data
-        gameField = try! JSONDecoder().decode([[CellModel]].self, from: data!)
+        do {
+            let data = aDecoder.decodeObject(forKey: "gameField") as? Data
+            gameField = try JSONDecoder().decode([[CellModel]].self, from: data!)
+        } catch {
+            return nil
+        }
+        
         emptyCells = aDecoder.decodeObject(forKey: "emptyCells") as! [IndexPath]
         dimention = aDecoder.decodeInteger(forKey: "dimention")
         hasChanges = aDecoder.decodeBool(forKey: "hasChanges")
